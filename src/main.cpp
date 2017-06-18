@@ -11,11 +11,14 @@
 
 #include "PathPlanner.hpp"
 #include <typeinfo>
+#include "Other_car.h"
 
 using namespace std;
 
 // for convenience
 using json = nlohmann::json;
+
+PathPlanner planner = PathPlanner();
 
 // Checks if the SocketIO event has JSON data.
 // If there is data the JSON object in string format will be returned,
@@ -70,7 +73,7 @@ int main() {
   }
 
   h.onMessage([&map_waypoints_x,&map_waypoints_y,&map_waypoints_s,&map_waypoints_dx,&map_waypoints_dy](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length,
-                     uWS::OpCode opCode) {
+										 uWS::OpCode opCode) {
     // "42" at the start of the message means there's a websocket message event.
     // The 4 signifies a websocket message
     // The 2 signifies a websocket event
@@ -113,20 +116,35 @@ int main() {
           	vector<double> next_x_vals;
           	vector<double> next_y_vals;
 
-						PathPlanner planner = PathPlanner();
-						planner.main_loop(car_x,
+						vector<double> pre_path_x = previous_path_x;
+						vector<double> pre_path_y = previous_path_x;
+
+						int N_other_cars = sensor_fusion.size();
+						vector<Other_car> other_cars;
+						if (N_other_cars) {
+							for (int i = 0; i < N_other_cars ; i++){
+								Other_car car(sensor_fusion[i][0],sensor_fusion[i][1],sensor_fusion[i][2],
+										sensor_fusion[i][3],sensor_fusion[i][4],sensor_fusion[i][5],
+										sensor_fusion[i][6]);
+								other_cars.push_back(car);
+							}
+						}
+
+
+						planner.update(car_x,
 												 car_y,
 												 car_s,
 												 car_d,
 												 car_yaw,
 												 car_speed,
-//												 previous_path_x,
-//												 previous_path_y,
+												 pre_path_x,
+												 pre_path_y,
 												 end_path_s,
 												 end_path_d,
-//												 sensor_fusion,
-												 next_x_vals,
-												 next_y_vals);
+												 other_cars);
+
+						planner.get_path(next_x_vals,
+														 next_y_vals);
 
           	// TODO: define a path made up of (x,y) points that the car will visit sequentially every .02 seconds
           	msgJson["next_x"] = next_x_vals;
