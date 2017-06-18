@@ -1,7 +1,10 @@
-#include "Tools.hpp"
+#include "tools.hpp"
+
+tools::tools(){}
+tools::~tools(){}
 
 // Transform from Cartesian x,y coordinates to Frenet s,d coordinates
-vector<double> Tools::getFrenet(double x, double y, double theta, vector<double> maps_x, vector<double> maps_y)
+vector<double> tools::getFrenet(double x, double y, double theta, vector<double> maps_x, vector<double> maps_y)
 {
 	int next_wp = NextWaypoint(x,y, theta, maps_x,maps_y);
 
@@ -49,12 +52,12 @@ vector<double> Tools::getFrenet(double x, double y, double theta, vector<double>
 
 }
 
-double Tools::distance(double x1, double y1, double x2, double y2)
+double tools::distance(double x1, double y1, double x2, double y2)
 {
 	return sqrt((x2-x1)*(x2-x1)+(y2-y1)*(y2-y1));
 }
 
-int Tools::ClosestWaypoint(double x, double y, vector<double> maps_x, vector<double> maps_y)
+int tools::ClosestWaypoint(double x, double y, vector<double> maps_x, vector<double> maps_y)
 {
 
 	double closestLen = 100000; //large number
@@ -77,7 +80,7 @@ int Tools::ClosestWaypoint(double x, double y, vector<double> maps_x, vector<dou
 
 }
 
-int Tools::NextWaypoint(double x, double y, double theta, vector<double> maps_x, vector<double> maps_y)
+int tools::NextWaypoint(double x, double y, double theta, vector<double> maps_x, vector<double> maps_y)
 {
 
 	int closestWaypoint = ClosestWaypoint(x,y,maps_x,maps_y);
@@ -99,7 +102,7 @@ int Tools::NextWaypoint(double x, double y, double theta, vector<double> maps_x,
 }
 
 // Transform from Frenet s,d coordinates to Cartesian x,y
-vector<double> Tools::getXY(double s, double d, vector<double> maps_s, vector<double> maps_x, vector<double> maps_y)
+vector<double> tools::getXY(double s, double d, vector<double> maps_s, vector<double> maps_x, vector<double> maps_y)
 {
 	int prev_wp = -1;
 

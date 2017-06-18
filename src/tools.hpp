@@ -1,15 +1,18 @@
 #ifndef TOOLS_H
 #define TOOLS_H
 
+#include <math.h>
 #include <vector>
 #include "Eigen-3.3/Eigen/Core"
 #include "Eigen-3.3/Eigen/QR"
 #include <iostream>
 
-class Tools{
+using namespace std;
+
+class tools{
 public:
-	Tools();
-	virtual ~Tools();
+	tools();
+	~tools();
 	vector<double> getFrenet(double x,
 													 double y,
 													 double theta,
@@ -34,6 +37,11 @@ public:
 											 vector<double> maps_s,
 											 vector<double> maps_x,
 											 vector<double> maps_y);
+
+	// For converting back and forth between radians and degrees.
+	double pi() { return M_PI; }
+	double deg2rad(double x) { return x * pi() / 180; }
+	double rad2deg(double x) { return x * 180 / pi(); }
 private:
 
 };

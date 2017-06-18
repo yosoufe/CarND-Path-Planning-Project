@@ -10,16 +10,12 @@
 #include "json.hpp"
 
 #include "PathPlanner.hpp"
+#include <typeinfo>
 
 using namespace std;
 
 // for convenience
 using json = nlohmann::json;
-
-// For converting back and forth between radians and degrees.
-constexpr double pi() { return M_PI; }
-double deg2rad(double x) { return x * pi() / 180; }
-double rad2deg(double x) { return x * 180 / pi(); }
 
 // Checks if the SocketIO event has JSON data.
 // If there is data the JSON object in string format will be returned,
@@ -35,8 +31,6 @@ string hasData(string s) {
   }
   return "";
 }
-
-PathPlanner planner();
 
 int main() {
   uWS::Hub h;
@@ -109,6 +103,8 @@ int main() {
           	double end_path_s = j[1]["end_path_s"];
           	double end_path_d = j[1]["end_path_d"];
 
+//						std::cout << typeid(previous_path_x).name() << endl;
+
           	// Sensor Fusion Data, a list of all other cars on the same side of the road.
           	auto sensor_fusion = j[1]["sensor_fusion"];
 
@@ -117,14 +113,20 @@ int main() {
           	vector<double> next_x_vals;
           	vector<double> next_y_vals;
 
-
-						double dist_inc = 0.5;
-						for(int i = 0; i < 50; i++)
-						{
-									next_x_vals.push_back(car_x+(dist_inc*i)*cos(deg2rad(car_yaw)));
-									next_y_vals.push_back(car_y+(dist_inc*i)*sin(deg2rad(car_yaw)));
-						}
-
+						PathPlanner planner = PathPlanner();
+						planner.main_loop(car_x,
+												 car_y,
+												 car_s,
+												 car_d,
+												 car_yaw,
+												 car_speed,
+//												 previous_path_x,
+//												 previous_path_y,
+												 end_path_s,
+												 end_path_d,
+//												 sensor_fusion,
+												 next_x_vals,
+												 next_y_vals);
 
           	// TODO: define a path made up of (x,y) points that the car will visit sequentially every .02 seconds
           	msgJson["next_x"] = next_x_vals;
