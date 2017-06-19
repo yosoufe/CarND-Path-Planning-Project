@@ -19,8 +19,6 @@ using namespace std;
 // for convenience
 using json = nlohmann::json;
 
-PathPlanner planner = PathPlanner();
-
 // Checks if the SocketIO event has JSON data.
 // If there is data the JSON object in string format will be returned,
 // else the empty string "" will be returned.
@@ -45,6 +43,8 @@ int main() {
   vector<double> map_waypoints_s;
   vector<double> map_waypoints_dx;
   vector<double> map_waypoints_dy;
+
+	PathPlanner planner = PathPlanner();
 
   // Waypoint map to read from
   string map_file_ = "../data/highway_map.csv";
@@ -73,10 +73,10 @@ int main() {
   	map_waypoints_dy.push_back(d_y);
   }
 
-	Map thisMap = Map(map_waypoints_x,map_waypoints_y,map_waypoints_s,map_waypoints_dx,map_waypoints_dy);
+	Map thisMap(map_waypoints_x,map_waypoints_y,map_waypoints_s,map_waypoints_dx,map_waypoints_dy);
 	planner.set_map(thisMap);
 
-  h.onMessage([&map_waypoints_x,&map_waypoints_y,&map_waypoints_s,&map_waypoints_dx,&map_waypoints_dy](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length,
+	h.onMessage([&map_waypoints_x,&map_waypoints_y,&map_waypoints_s,&map_waypoints_dx,&map_waypoints_dy,&planner,&thisMap](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length,
 										 uWS::OpCode opCode) {
     // "42" at the start of the message means there's a websocket message event.
     // The 4 signifies a websocket message
