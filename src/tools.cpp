@@ -128,3 +128,11 @@ vector<double> tools::getXY(double s, double d, vector<double> maps_s, vector<do
 	return {x,y};
 
 }
+
+vector<double> tools::operation(vector<double> &sorc1,vector<double> &sorc2, double times_by){
+	vector<double> result;
+	for (int i = 0; i< sorc1.size(); i++){
+		result.push_back(sorc1[i] + sorc2[i]*times_by);
+	}
+	return result;
+}

@@ -11,7 +11,8 @@
 
 #include "PathPlanner.hpp"
 #include <typeinfo>
-#include "Other_car.h"
+#include "Other_car.hpp"
+#include "map.hpp"
 
 using namespace std;
 
@@ -71,6 +72,9 @@ int main() {
   	map_waypoints_dx.push_back(d_x);
   	map_waypoints_dy.push_back(d_y);
   }
+
+	Map thisMap = Map(map_waypoints_x,map_waypoints_y,map_waypoints_s,map_waypoints_dx,map_waypoints_dy);
+	planner.set_map(thisMap);
 
   h.onMessage([&map_waypoints_x,&map_waypoints_y,&map_waypoints_s,&map_waypoints_dx,&map_waypoints_dy](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length,
 										 uWS::OpCode opCode) {

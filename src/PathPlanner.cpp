@@ -6,6 +6,13 @@ PathPlanner::PathPlanner(){
 
 PathPlanner::~PathPlanner() {}
 
+void PathPlanner::set_map(Map &map){
+	m_map = map;
+
+	m_lane2_x.set_points(m_map.m_map_waypoints_s, m_tools.operation(m_map.m_map_waypoints_x,m_map.m_map_waypoints_dx,6));
+	m_lane2_y.set_points(m_map.m_map_waypoints_s, m_tools.operation(m_map.m_map_waypoints_y,m_map.m_map_waypoints_dy,6));
+}
+
 void PathPlanner::update(double car_x,
 											 double car_y,
 											 double car_s,
@@ -31,13 +38,53 @@ void PathPlanner::update(double car_x,
 
 }
 
-void PathPlanner::get_path(vector<double> &next_x_vals,
-													 vector<double> &next_y_vals){
+void PathPlanner::keep_lane(vector<double> &next_x_vals,
+														vector<double> &next_y_vals){
+	double pos_x;
+	double pos_y;
+	double angle;
+	int path_size = fmin( m_previous_path_x.size() , 20);
+	for(int i = 0; i < path_size; i++)
+	{
+			next_x_vals.push_back(m_previous_path_x[i]);
+			next_y_vals.push_back(m_previous_path_y[i]);
+	}
 
+	if (path_size==0){
+		pos_x = m_car_x;
+		pos_y = m_car_y;
+		angle = m_tools.deg2rad(m_car_yaw);
+	}
+	else
+	{
+		pos_x = m_previous_path_x[path_size-1];
+		pos_y = m_previous_path_y[path_size-1];
+
+		double pos_x2 = m_previous_path_x[path_size-2];
+		double pos_y2 = m_previous_path_y[path_size-2];
+		angle = atan2(pos_y-pos_y2,pos_x-pos_x2);
+	}
+
+	vector<double> pos_sd = m_tools.getFrenet(pos_x,pos_y,angle,m_map.m_map_waypoints_x,m_map.m_map_waypoints_x);
+
+	double dist_inc = set_speed (50);//MPH
+	for(int i = 0; i < 50 - path_size ; i++){
+		double s_t = pos_sd[0] + dist_inc * i;
+		next_x_vals.push_back(m_lane2_x(s_t));
+		next_y_vals.push_back(m_lane2_y(s_t));
+	}
 }
 
-void PathPlanner::keep_lane(){
+void PathPlanner::get_path(vector<double> &next_x_vals,
+													 vector<double> &next_y_vals){
+	keep_lane(next_x_vals,next_y_vals);
+}
 
+float PathPlanner::set_speed(float desired){
+	desired *= 0.44704; // convert mph to m/s
+	const float time_interval = 0.02; // second between each point
+	float inc = desired * time_interval;
+	return inc;
 }
 
 

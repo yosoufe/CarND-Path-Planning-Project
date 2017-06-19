@@ -2,7 +2,7 @@
 #define OTHER_CAR_H
 
 class Other_car{
-public:
+private:
     int id;
     float x;
     float y;
@@ -11,6 +11,7 @@ public:
     float s;
     float d;
 
+public:
     Other_car(int id, float x,float y,float vx,float vy,float s,float d):id(id)
       ,x(x),y(y),vx(vx),vy(vy),s(s),d(d){}
 };

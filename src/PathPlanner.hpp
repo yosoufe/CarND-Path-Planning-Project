@@ -8,7 +8,9 @@
 #include "Eigen-3.3/Eigen/QR"
 
 #include "tools.hpp"
-#include "Other_car.h"
+#include "Other_car.hpp"
+#include "map.hpp"
+#include "spline.h"
 
 using namespace std;
 
@@ -33,8 +35,12 @@ public:
 	void get_path(vector<double> &next_x_vals,
 								vector<double> &next_y_vals);
 
+	void set_map(Map &map);
+
 private:
 	tools m_tools;
+
+	Map m_map;
 
 	double m_car_x;
 	double m_car_y;
@@ -48,7 +54,12 @@ private:
 	double m_end_path_d;
 	vector<Other_car> m_sensor_fusion;
 
-	void keep_lane(void);
+//	tk::spline m_lane1_x,m_lane1_y;
+	tk::spline m_lane2_x,m_lane2_y;
+//	tk::spline m_lane3_x,m_lane3_y;
+	void keep_lane(vector<double> &next_x_vals,
+								 vector<double> &next_y_vals);
+	float set_speed(float desired);
 };
 
 
