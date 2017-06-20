@@ -3,7 +3,7 @@
 #include <uWS/uWS.h>
 #include <chrono>
 #include <iostream>
-#include <thread>
+//#include <thread>
 #include <vector>
 #include "Eigen-3.3/Eigen/Core"
 #include "Eigen-3.3/Eigen/QR"
@@ -120,8 +120,15 @@ int main() {
           	vector<double> next_x_vals;
           	vector<double> next_y_vals;
 
-						vector<double> pre_path_x = previous_path_x;
-						vector<double> pre_path_y = previous_path_x;
+						vector<double> pre_path_x;
+						vector<double> pre_path_y;
+
+						if(previous_path_x.size()){
+							for (int i=0; i < previous_path_x.size(); i++){
+								pre_path_x.push_back((double)(previous_path_x[i]));
+								pre_path_y.push_back((double)(previous_path_y[i]));
+							}
+						}
 
 						int N_other_cars = sensor_fusion.size();
 						vector<Other_car> other_cars;

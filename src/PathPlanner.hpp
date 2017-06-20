@@ -26,11 +26,11 @@ public:
 						double car_d,
 						double car_yaw,
 						double car_speed,
-						vector<double> previous_path_x,
-						vector<double> previous_path_y,
+						vector<double> &previous_path_x,
+						vector<double> &previous_path_y,
 						double end_path_s,
 						double end_path_d,
-						vector<Other_car> sensor_fusion);
+						vector<Other_car> &sensor_fusion);
 
 	void get_path(vector<double> &next_x_vals,
 								vector<double> &next_y_vals);
