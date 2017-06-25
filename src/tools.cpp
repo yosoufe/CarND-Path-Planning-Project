@@ -1,12 +1,85 @@
 #include "tools.hpp"
 
-tools::tools(){}
+tools::tools(){
+	myfile = std::fopen("graph1","w");
+	std::fclose(myfile);
+
+	gp_ = popen("gnuplot -persist" , "w");
+}
 tools::~tools(){}
+
+void tools::updateGraphFromFile(double value){
+	myfile = std::fopen("NIS_lidar","a");
+	if(myfile != NULL){
+		std::string toWrite = std::to_string(value) + '\n';
+		std::fwrite(toWrite.c_str(),1,toWrite.length(),myfile);
+		std::fclose(myfile);
+	}
+
+	if (gp_!=NULL){
+		fprintf(gp_ , "call '../plotScript.gp'\n");
+		std::fflush(gp_);
+	}
+}
+
+void tools::plot(vector<vector<double>> &data){
+	if (gp_!=NULL && data.size()!=0){
+		fprintf(gp_ , "plot '-' using 1:2 with lines\n");
+		for (int i=0; i< data.size(); i++){
+			fprintf(gp_, "%f.5 %f.5\n",data[i][0],data[i][1]);
+		}
+		fprintf(gp_,"e\n");
+		fflush(gp_);
+	}
+}
+
+void tools::plot(vector<double> &x , vector<double> &y, char const* color){
+	if (gp_!=NULL && x.size()!=0 && x.size()==y.size()){
+		fprintf(gp_ , "plot '-' using 1:2 with linespoint lc rgb '%s'\n",color);
+		for (int i=0; i< x.size(); i++){
+			fprintf(gp_, "%f %f\n",x[i],y[i]);
+		}
+		fprintf(gp_,"e\n");
+		fflush(gp_);
+	}
+}
+
+void tools::twoPlot(vector<double> &x , vector<double> &y, char const* color, vector<double> &x1 , vector<double> &y1, char const* color1){
+	if (gp_!=NULL && x.size()!=0 && x.size()==y.size() && x1.size()!=0 && x1.size()==y1.size()){
+		fprintf(gp_ , "reset\n");
+		fprintf(gp_ , "set size ratio -1\n");
+		//fprintf(gp_ , "set size 1,1\n");
+		fprintf(gp_ , "set multiplot\n");
+		//fprintf(gp_ , "set size square\n");
+		fprintf(gp_ , "set size 0.5,1\n");
+		fprintf(gp_ , "set origin 0,0\n");
+		fprintf(gp_ , "plot '-' using 1:2 with linespoint lc rgb '%s', '-' using 1:2 with linespoint lc rgb '%s'\n",color, color1);
+		for (int i=0; i< x.size(); i++){
+			fprintf(gp_, "%f %f\n",x[i],y[i]);
+		}
+		fprintf(gp_,"e\n");
+		fflush(gp_);
+		for (int i=0; i< x1.size(); i++){
+			fprintf(gp_, "%f %f\n",x1[i],y1[i]);
+		}
+		fprintf(gp_,"e\n");
+		fflush(gp_);
+
+		fprintf(gp_ , "set origin 0.5,0\n");
+		//fprintf(gp_ , "set size square\n");
+		fprintf(gp_ , "plot '-' using 1:2 with linespoint lc rgb '%s'\n", color1);
+		for (int i=0; i< x1.size(); i++){
+			fprintf(gp_, "%f %f\n",x1[i],y1[i]);
+		}
+		fprintf(gp_,"e\n");
+		fflush(gp_);
+	}
+}
 
 // Transform from Cartesian x,y coordinates to Frenet s,d coordinates
 vector<double> tools::getFrenet(double x, double y, double theta, vector<double> maps_x, vector<double> maps_y)
 {
-	int next_wp = NextWaypoint(x,y, theta, maps_x,maps_y);
+	int next_wp = NextWaypoint(x,y, theta, maps_x, maps_y);
 
 	int prev_wp;
 	prev_wp = next_wp-1;

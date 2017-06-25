@@ -44,8 +44,14 @@ public:
 	double rad2deg(double x) { return x * 180.0 / M_PI; }
 
 	vector<double> operation(vector<double> &sorc1,vector<double> &sorc2, double times_by);
-private:
+	void updateGraphFromFile(double value);
+	void plot(vector<vector<double>> &data);
+	void plot(vector<double> &x , vector<double> &y, char const* color);
+	void twoPlot(vector<double> &x , vector<double> &y, char const* color, vector<double> &x1 , vector<double> &y1, char const* color1);
 
+private:
+	FILE *myfile;
+	FILE *gp_;
 };
 
 #endif // TOOLS_H
