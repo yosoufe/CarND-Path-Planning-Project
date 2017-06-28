@@ -52,9 +52,6 @@ void PathPlanner::keep_lane(vector<double> &next_x_vals,
 	}
 
 	if (path_size==0){
-//		pos_x = m_car_x;
-//		pos_y = m_car_y;
-//		angle = m_tools.deg2rad(m_car_yaw);
 		new_start_s = m_car_s;
 	}
 	else
@@ -65,20 +62,16 @@ void PathPlanner::keep_lane(vector<double> &next_x_vals,
 		double pos_x2 = m_previous_path_x[path_size-2];
 		double pos_y2 = m_previous_path_y[path_size-2];
 		angle = atan2(pos_y-pos_y2,pos_x-pos_x2);
-
-//		new_start_s = m_end_path_s;
-//		vector<double> new_s_d = m_tools.getFrenet(pos_x,pos_y,angle,m_map.m_map_waypoints_x,m_map.m_map_waypoints_y);
-//		new_start_s = new_s_d[0];
 	}
 
-	double dist_inc = set_speed (150);//MPH
+	double dist_inc = set_speed (48);//MPH
 	for(int i = 0; i < 50 - path_size ; i++){
 		new_start_s += dist_inc;
-		vector<double> ne_xy = m_tools.getXY(new_start_s,6,m_map.m_map_waypoints_s,m_map.m_map_waypoints_x,m_map.m_map_waypoints_y);
-		next_x_vals.push_back(ne_xy[0]);
-		next_y_vals.push_back(ne_xy[1]);
+
+		next_x_vals.push_back(m_lane2_x(new_start_s));
+		next_y_vals.push_back(m_lane2_y(new_start_s));
 	}
-	m_tools.twoPlot(m_map.m_map_waypoints_x,m_map.m_map_waypoints_y,"blue",next_x_vals,next_y_vals,"red");
+//	m_tools.twoPlot(m_map.m_map_waypoints_x,m_map.m_map_waypoints_y,"blue",next_x_vals,next_y_vals,"red");
 }
 
 void PathPlanner::get_path(vector<double> &next_x_vals,
