@@ -11,8 +11,10 @@
 #include "Other_car.hpp"
 #include "map.hpp"
 #include "spline.h"
+#include "track.hpp"
 
-#define TIME_INTERVAL 0.02f
+#define TIME_INTERVAL 0.02
+#define MPH2MS				0.44704
 
 using namespace std;
 
@@ -21,6 +23,11 @@ public:
 	PathPlanner();
 
 	~PathPlanner();
+
+	enum lane_changing_status{
+		CHANGING_LANE,
+		KEEPING_LANE
+	}m_change_status;
 
 	void update(double car_x,
 						double car_y,
@@ -55,15 +62,28 @@ private:
 	double m_end_path_s;
 	double m_end_path_d;
 	vector<Other_car> m_sensor_fusion;
+	vector<Other_car> m_front_car;
 
-//	tk::spline m_lane1_x,m_lane1_y;
-	tk::spline m_lane2_x,m_lane2_y;
-//	tk::spline m_lane3_x,m_lane3_y;
-	void keep_lane(vector<double> &next_x_vals,
-								 vector<double> &next_y_vals);
-	float set_speed(float desired, float pre_speed);
-	float inc2MPH(float inc);
-	float MPH2inc(float MPH);
+	Track m_left,m_center,m_right;
+	Track m_change;
+
+	void keep_track(vector<double> &next_x_vals,
+								 vector<double> &next_y_vals,
+								 float speed,
+								 int path_length,
+								 Track &lane);
+	double set_speed(double desired, double pre_speed);
+	double inc2MPH(double inc);
+	double MPH2inc(double MPH);
+	Other_car get_front_car(double d,double planned_s, double secure_dist);
+	vector<Other_car> find_cars_on_this_side(double d);
+	vector<Other_car> find_cars_on_this_lane(double d,vector<Other_car> &among_these_cars);
+	Other_car find_closest_car(double s,vector<Other_car> &among_these_cars);
+
+	void setup_lane_changing(Track target, Track curr ,float s_obstacle, float speed);
+	void change_lane_to(Track lane);
+
+	Track find_best_escape_lane(Track &current_lane);
 };
 
 
