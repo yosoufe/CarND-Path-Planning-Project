@@ -80,10 +80,10 @@ private:
 	vector<Other_car> find_cars_on_this_lane(double d,vector<Other_car> &among_these_cars);
 	Other_car find_closest_car(double s,vector<Other_car> &among_these_cars);
 
-	void setup_lane_changing(Track target, Track curr ,float s_obstacle, float speed);
+	void setup_lane_changing(Track target, Track curr ,float s_obstacle);
 	void change_lane_to(Track lane);
 
-	Track find_best_escape_lane(Track &current_lane);
+	void find_best_escape_lane(Track &current_lane, Track &target);
 };
 
 

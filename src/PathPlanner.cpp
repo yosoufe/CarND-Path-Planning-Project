@@ -93,7 +93,7 @@ void PathPlanner::keep_track(vector<double> &next_x_vals,
 		next_y_vals.push_back(lane.m_s_y(s_p));
 	}
 	pre_planned_s = planned_s;
-//	m_tools.twoPlot(m_map.m_map_waypoints_x,m_map.m_map_waypoints_y,"blue",next_x_vals,next_y_vals,"red");
+	m_tools.twoPlot(m_map.m_map_waypoints_x,m_map.m_map_waypoints_y,"blue",next_x_vals,next_y_vals,"red");
 }
 
 
@@ -115,20 +115,21 @@ void PathPlanner::get_path(vector<double> &next_x_vals,
 
 	switch (m_change_status){
 		case CHANGING_LANE:
-			if (m_car_s +secure_dist < m_change.m_s_end){
+			if (m_car_s + secure_dist < m_change.m_s_end){
 				keep_track(next_x_vals,next_y_vals,speed,path_length,m_change);
 			} else{
 				m_change_status = KEEPING_LANE;
 			}
-			// no break is by purpose (it is NOT a mistake)
+			break;
 		case KEEPING_LANE:
 			if (fabs(m_car_d-6.0)<1.0){ // I Am in second lane
 
 
-				if (front_car_center.id != 0){
-					Track target = find_best_escape_lane(m_center);
+				if (front_car_center.id != 0){ //front_car_center.id != 0
+					Track target;
+					find_best_escape_lane(m_center,target);
 					if (target.m_id != m_center.m_id){
-						setup_lane_changing(target,m_center,front_car_center.s,speed);
+						setup_lane_changing(target,m_center,front_car_center.s); //front_car_center.s
 					}
 					float s_diff = front_car_center.s-m_car_s;
 					speed = inc2MPH(s_diff/path_length);
@@ -141,7 +142,6 @@ void PathPlanner::get_path(vector<double> &next_x_vals,
 			} else if (fabs(m_car_d-10.0)<1.0){ // I am in right lane
 			keep_track(next_x_vals,next_y_vals,speed,path_length,m_right);
 			}
-
 			break;
 	}
 }
@@ -243,39 +243,40 @@ void PathPlanner::change_lane_to(Track lane){
 
 }
 
-void PathPlanner::setup_lane_changing(Track target, Track curr ,float s_obstacle,float speed){
+void PathPlanner::setup_lane_changing(Track target, Track curr ,float s_obstacle){
 	vector<double> x,y,s_;
 	float s = m_car_s;
-	for (; s < s_obstacle; ){
-
+	float inc =1.0;
+	while(s < s_obstacle){
+		s += inc;
 		double temp_x = curr.m_s_x(s);
 		double temp_y = curr.m_s_y(s);
 		s_.push_back(s);
 		x.push_back(temp_x);
 		y.push_back(temp_y);
-		float inc = MPH2inc(speed);
-		s += inc;
 	}
 
 	s += 40;
 	float d = s + 40;
 
-	for (; s < d; ){
+	while(s < d){
+		s += inc;
 		double temp_x = target.m_s_x(s);
 		double temp_y = target.m_s_y(s);
 		s_.push_back(s);
 		x.push_back(temp_x);
 		y.push_back(temp_y);
-		float inc = MPH2inc(speed);
-		s += inc;
 	}
 
 	m_change = Track(s_,x,y,0);
 	m_change.m_s_end = s;
+	m_change.m_s_x.set_points(s_,x);
+	m_change.m_s_y.set_points(s_,y);
 	m_change_status = CHANGING_LANE;
+	m_tools.twoPlot(m_map.m_map_waypoints_x,m_map.m_map_waypoints_y,"blue",x,y,"red");
 }
 
-Track PathPlanner::find_best_escape_lane(Track &current_lane){
+void PathPlanner::find_best_escape_lane(Track &current_lane, Track &target){
 	Track result;
 	float dist = INFINITY;
 	for (int i=0; i<current_lane.priority_to_change_to.size();i++){
@@ -285,5 +286,5 @@ Track PathPlanner::find_best_escape_lane(Track &current_lane){
 			result = current_lane.priority_to_change_to[i];
 		}
 	}
-	return result;
+	target = result;
 }
