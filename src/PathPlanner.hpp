@@ -64,7 +64,7 @@ private:
 	vector<Other_car> m_sensor_fusion;
 	vector<Other_car> m_front_car;
 
-	Track m_left,m_center,m_right;
+	vector<Track> m_lanes;// left, center,right
 	Track m_change;
 
 	void keep_track(vector<double> &next_x_vals,
@@ -75,15 +75,14 @@ private:
 	double set_speed(double desired, double pre_speed);
 	double inc2MPH(double inc);
 	double MPH2inc(double MPH);
-	Other_car get_front_car(double d,double planned_s, double secure_dist);
+	void get_front_car(Other_car &result1,double d,double planned_s, double secure_dist, float secure_dist_neg);
 	vector<Other_car> find_cars_on_this_side(double d);
 	vector<Other_car> find_cars_on_this_lane(double d,vector<Other_car> &among_these_cars);
-	Other_car find_closest_car(double s,vector<Other_car> &among_these_cars);
+	Other_car find_closest_car(double s,vector<Other_car> &among_these_cars, float secure_dist_neg);
 
-	void setup_lane_changing(Track target, Track curr ,float s_obstacle);
-	void change_lane_to(Track lane);
+	void setup_lane_changing(Track &target, Track &curr ,float s_obstacle);
 
-	void find_best_escape_lane(Track &current_lane, Track &target);
+	void find_best_escape_lane(Track &current_lane, Track &target, float secure_dist);
 };
 
 
