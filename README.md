@@ -132,3 +132,7 @@ that's just a guess.
 
 One last note here: regardless of the IDE used, every submitted project must
 still be compilable with cmake and make./
+
+# License:
+You can do what ever you want with this code.
+There is no guarantee for this code to work for anything.
