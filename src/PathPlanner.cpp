@@ -113,8 +113,8 @@ void PathPlanner::keep_track(vector<double> &next_x_vals,
 
 void PathPlanner::get_path(vector<double> &next_x_vals,
                            vector<double> &next_y_vals){
-    float speed = 48.5;//MPH
-    int path_length = 50;
+    float speed = 47.5;//MPH
+    int path_length = 50;// meters
     float secure_dist = (speed+20) * MPH2MS * path_length * TIME_INTERVAL;
 
     Track lane;
@@ -140,7 +140,7 @@ void PathPlanner::get_path(vector<double> &next_x_vals,
 
     switch (m_change_status){
     case CHANGING_LANE:
-        speed = 40;
+        //speed = 45;
         if (m_car_s + secure_dist < m_change.m_s_end){
             keep_track(next_x_vals,next_y_vals,speed,path_length,m_change);
         } else{
@@ -150,7 +150,7 @@ void PathPlanner::get_path(vector<double> &next_x_vals,
         break;
     case KEEPING_LANE:
         Other_car car = m_front_car[lane.m_id-1];
-        if ( !(car.isEmpty) ){ //If there is a car in front in this line
+        if ( !(car.isEmpty) ){ //If there is a car in front in this lane
             Track target;
             find_best_escape_lane(lane,target, secure_dist);
             float s_diff = car.s-m_car_s;
@@ -160,7 +160,7 @@ void PathPlanner::get_path(vector<double> &next_x_vals,
                 keep_track(next_x_vals,next_y_vals,speed,path_length,m_change);
                 break;
             } else { // if the target lane is the same as current lane and avoid crashing front car
-                speed = sqrt(car.vx*car.vx + car.vy * car.vy);//inc2MPH(fmin( (car.s - m_car_s - 2.0) / path_length , 48.5));
+                speed = fmin(sqrt(car.vx*car.vx + car.vy * car.vy),48.5);
                 keep_track(next_x_vals,next_y_vals,speed,path_length,lane);
                 break;
             }
@@ -173,14 +173,24 @@ void PathPlanner::get_path(vector<double> &next_x_vals,
 }
 
 double PathPlanner::set_speed(double desired, double pre_speed){
+    // 0.224
+    /*
     double error = desired - pre_speed;
-    double step = 0.005 * error;
+    double step =  error;
     if(fabs(error) < 0.01){
         step = 0;
     }
 
     double inc = MPH2inc(pre_speed+step); //pre_speed+step
     return inc;
+    */
+
+    double error = desired - pre_speed;
+    //if (error> 0 && error < 0.5)
+    //    return MPH2inc(pre_speed);
+
+    double sign = (0.0 < error) - (error < 0.0);
+    return MPH2inc(sign*0.224+pre_speed);
 }
 
 double PathPlanner::inc2MPH(double inc){
@@ -189,7 +199,7 @@ double PathPlanner::inc2MPH(double inc){
 }
 
 double PathPlanner::MPH2inc(double MPH){
-    double inc =MPH * TIME_INTERVAL * MPH2MS;
+    double inc = MPH * TIME_INTERVAL * MPH2MS;
     return inc;
 }
 

@@ -13,7 +13,7 @@
 #include "spline.h"
 #include "track.hpp"
 
-#define TIME_INTERVAL 0.02
+#define TIME_INTERVAL       0.02
 #define MPH2MS				0.44704
 
 using namespace std;
