@@ -13,6 +13,23 @@ track which may be followed during the lane change. All the tacks are defined ba
 (s,y). That means to get the `x,y` coordinate of the track given the `s` there is one spline for one coordinate, in total 2 spline.
 * **tools** class: including all helper functions and also plotting features. In order to use this you will need the `gnuplot`.(`sudo apt install gnuplot`). Right now all the codes for plotting is commented therefore the current version does not need it.
 
+The function `PathPlanner::get_path` does the main job. Here there are two states defined:
+
+#### KEEPING_LANE:
+which follows the current lane and keep an eye on the front cars not to hit them.
+First it looks the cars in front. If there is a car inside the secure distance from the car in the current lanes, it looks 
+for the other lanes to find an escape manouver. This is done if there is no car as well in other lane in the seure lanes. 
+That means There should not be any car in `secure distance + 20` meters forward and `10` meters backward to change the 
+state to the CHANGING_LANE. The `secure distance` is dependent of the speed. Faster the car is driving, the larger the `secure distance` is considered.
+
+Before changing to CHANGING_LANE state it produces the desired track for lane change. This track is designed like the below:
+* It chooses few points in current lane from 20 meters of back side of the car until the `s` position of the front car (obstace), then
+* chooses few point in the target lane from 40 metere in front of the front car (obstacle) until 80 meter in front of the front car (obstacle), then
+* it fits two splines to these points. (s,x) and (s,y).
+* Now using these tracks
+#### CHANGING_LANE:
+It is simply doing the changed lane and followinf the track produced before as descrribed above.
+
 ## Dependencies
 
 * cmake >= 3.5
