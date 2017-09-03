@@ -28,7 +28,13 @@ Before changing to CHANGING_LANE state it produces the desired track for lane ch
 * it fits two splines to these points. (s,x) and (s,y).
 * Now using these tracks
 #### CHANGING_LANE:
-It is simply doing the changed lane and followinf the track produced before as descrribed above.
+It is simply doing the changed lane and followinf the track produced before as descrribed above. It switches again to KEEPING_LANE state when it reaches close to the end of the generated track.
+
+## Following a track:
+Whether it is a lane or produced for lane change. It is defined in function `PathPlanner::keep_track`.
+* it saves the first 20 unmet points from the previous generated path to have a smooth maneuver.
+* The it generates `s` values along the given track based on the given target speed.
+* Then it generates the `x` and `y` values given the track and using the spline equations. `(s,x) & (s,y)`.
 
 ## Dependencies
 
